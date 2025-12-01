@@ -485,11 +485,11 @@ def chon_dong_gd(e):
         for item in list_gv_combo:
             if ten_gv in item: cbb_gd_magv.set(item); break
         cbb_gd_mon.delete(0, tk.END)
-        cbb_gd_mon.insert(0, r[2])
+        cbb_gd_mon.set(r[2])
         entry_gd_lop.delete(0, tk.END)
         entry_gd_lop.insert(0, r[3])
         cbb_gd_to.delete(0, tk.END)
-        cbb_gd_to.insert(0, r[4])
+        cbb_gd_to.set(r[4])
         entry_gd_tiet.delete(0, tk.END)
         entry_gd_tiet.insert(0, r[5])
 
