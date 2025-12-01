@@ -436,7 +436,7 @@ def them_gd():
     gv_str = cbb_gd_magv.get()
     if not gv_str: return
     magv = gv_str.split(' - ')[0]
-    data = (magv, cbb_gd_mon.get(), entry_gd_lop.get(), cbb_gd_to.get().get(), entry_gd_tiet.get())
+    data = (magv, cbb_gd_mon.get(), entry_gd_lop.get(), cbb_gd_to.get(), entry_gd_tiet.get())
     conn = ketnoi_database()
     if conn:
         try:
