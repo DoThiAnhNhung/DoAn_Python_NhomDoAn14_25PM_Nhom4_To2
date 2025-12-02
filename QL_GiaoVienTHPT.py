@@ -12,10 +12,10 @@ LUONG_CO_BAN = 1800000
 
 def ketnoi_database():
     conn_str = (
-        r'DRIVER={SQL Server};'
-        r'SERVER=ADMIN\SQLEXPRESS;'  
-        r'DATABASE=QL_GiaoVien;'
-        r'Trusted_Connection=yes;'
+        r"DRIVER={ODBC Driver 17 for SQL Server};"
+         r"SERVER=localhost;"
+         r"DATABASE=QL_GiaoVien;"
+         r"Trusted_Connection=yes;"
     )
     try:
         return pyodbc.connect(conn_str)
@@ -493,6 +493,22 @@ def chon_dong_gd(e):
         entry_gd_tiet.delete(0, tk.END)
         entry_gd_tiet.insert(0, r[5])
 
+def xuat_excel_gd():
+    conn = ketnoi_database()
+    if conn:
+        try:
+            query = "SELECT MaGV, MonHoc , LopPhuTrach , ToCongTac , SoTietTuan FROM GiangDay"
+            df = pd.read_sql(query, conn)
+            
+            path = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx")])
+            if path:
+                df.to_excel(path, index=False)
+                messagebox.showinfo("Xuất Excel", f"Đã xuất file thành công tại:\n{path}")
+        except Exception as e:
+            messagebox.showerror("Lỗi Xuất File", str(e))
+        finally:
+            conn.close()
+
 # GUI TAB 2
 fr_gd_info = tk.LabelFrame(tab_giangday, text="Thông tin Phân công", font=("Arial", 10, "bold"), fg="#D35400", padx=10, pady=10)
 fr_gd_info.pack(fill="x", padx=15, pady=10)
@@ -538,7 +554,9 @@ btn_xoa_gd.pack(side="left", padx=5)
 btn_moi_gd = tk.Button(fr_btn2, text="Mới", command=clear_gd, bg="#17a2b8", 
                        fg="white", font=("Arial", 10, "bold"), width=12, relief="raised", bd=3)
 btn_moi_gd.pack(side="left", padx=5)
-
+btn_xuat_gd  = tk.Button(fr_btn2, text="Xuất Excel", command=xuat_excel_gd, bg="#207245", 
+                         fg="white", font=("Arial", 10, "bold"), width=12, relief="raised", bd=3)
+btn_xuat_gd.pack(side="left", padx=20)
 # --- Treeview ---
 cols_gd = ("ID", "GV", "MON", "LOP", "TO", "TIET")
 tree_gd = ttk.Treeview(tab_giangday, columns=cols_gd, show="headings", height=12)
@@ -572,7 +590,10 @@ def load_data_luong():
             for row in cur.fetchall():
                 r = list(row)
                 thuc_lanh = (r[2] * LUONG_CO_BAN) + r[4] + r[5]
+                r[4]= "{:,.0f} VNĐ".format(r[4])
+                r[5]= "{:,.0f} VNĐ".format(r[5])
                 r.append("{:,.0f} VNĐ".format(thuc_lanh))
+
                 tree_luong.insert("", tk.END, values=r)
         except: pass
         finally: conn.close()
@@ -655,6 +676,13 @@ def chon_dong_luong(e):
         entry_phucap.insert(0, str(r[4]).replace('.0',''))
         entry_thuong.delete(0, tk.END)
         entry_thuong.insert(0, str(r[5]).replace('.0',''))
+
+        def clean(value):
+            return value.replace(' VNĐ','').replace(',','')
+        entry_phucap.delete(0, tk.END)
+        entry_phucap.insert(0, clean(str(r[4])))
+        entry_thuong.delete(0, tk.END)  
+        entry_thuong.insert(0, clean(str(r[5])))
 
 # GUI TAB 3 
 fr_luong_info = tk.LabelFrame(tab_luong, text="Tính Lương Chi Tiết", font=("Arial", 10, "bold"), fg="#27AE60", padx=10, pady=10)
